@@ -1,0 +1,130 @@
+大视频文件分片上传(适用于大视频的硬字幕提取)
+POST /slice_upload
+请求参数:
+file: 文件域, 必填参数
+
+响应数据:
+{
+        "file_hash": file_hash,
+        "chunk_count": chunk_count,
+        "file_name": file_name_without_suffix,
+        "file_type": file_type,
+        "file_size": file_size,
+        "status": "file_received"
+}
+响应数据中字段含义解释:
+file_hash: 文件hash值, hash值相同则表示为同一个文件(注意:同一个文件修改文件名称不影响文件的hash值)
+chunk_count: 文件分片数
+file_name: 用户上传的视频文件的原始文件名称(不包含后缀名)
+file_size: 用户上传的视频文件的体积大小(单位: byte)
+status: 文件上传状态(file_received表示文件已被接收, 服务器正在分片处理中), 若调用后, 服务端返回的status值不是file_received, 则表明服务端处理出问题了.
+
+
+
+视频文件分片合并
+POST /file_merge
+请求参数:
+file_hash: 文件hash值, 必填参数
+chunk_count: 文件分片数, 字符串类型, 必填参数
+file_name: 用户上传的视频文件的原始文件名称(不包含后缀名), 字符串类型, 必填参数
+file_type: 用户上传的视频文件的原始文件的后缀名(不包含点号), 必填参数
+file_size: 用户上传的视频文件的体积大小(单位: byte), 字符串类型, 必填参数
+
+响应数据:
+{
+    "code": 200, 
+    "message": "ok", 
+    "status": "ready_for_subtitle_extraction",
+    "file_name": file_name, 
+    "file_type": file_type, 
+    "file_size": file_size, 
+    "file_hash": file_hash
+}
+status状态值说明:
+ready_for_subtitle_extraction: 表明视频分片已经合并完成, 可以开始调用/hard_subtitle_extract硬字幕提取接口了.
+upload folder not exists: 表示视频文件的上传目录不存在,可能被人为删除,导致无法实现视频文件合并,此时用户需要调用/slice_upload接口以重新上传视频
+part file count not equals to chunk_count: 视频实际分片数与用户当前传入的分片数不一致, 此时用户需要输入正确的视频分片数后再调用当前接口进行重试
+file_merging: 表明视频文件当前正在合并中, 用户需要间隔固定时间,定时轮询当前接口, 直至当前接口返回的status==ready_for_subtitle_extraction
+
+
+
+
+
+大视频文件硬字幕提取(适用于大视频的硬字幕提取)
+POST /hard_subtitle_extract
+请求参数:
+file_hash: 文件hash值, 字符串类型, 必填参数
+file_name: 文件名称(不包含后缀名),字符串类型, 必填参数
+file_type: 文件后缀名(不带点号),字符串类型, 必填参数
+time_start: 视频字幕提取的起始时间点, 格式为hh:mm:ss或mm:ss, 字符串类型, 可选参数, 默认值为00:00
+time_end: 视频字幕提取的截止时间点, 格式为hh:mm:ss或mm:ss, 字符串类型, 可选参数, 默认值为当前视频的末尾,此时程序会自动计算
+user_fullframe: 是否全屏识别字幕, bool类型, 可选参数,默认值为False, False=只识别图片底部的字幕, True=图片上任意位置出现的文本都识别为字幕
+响应数据:
+提取成功时
+{
+    "code": 200,
+    "message": "ok",
+    "status": "success",
+    "task_id": task_id,
+    "file_hash": file_hash,
+    "data": hard_subtitle_list
+}
+data: 视频硬字幕数据
+
+提取失败时
+{
+    "code": 200,
+    "message": "ok",
+    "status": "no hard subtitle extracted",
+    "data": []
+}
+no hard subtitle extracted-->当前视频提取到的硬字幕数据为空
+
+{
+    "code": 200,
+    "message": "ok",
+    "status": "target video file not found",
+    "data": []
+}
+target video file not found --> 目标视频文件不存在,可能被人为删除,导致无法进行硬字幕识别, 用户需要重新上传视频文件
+
+{
+    "code": 200,
+    "message": "ok",
+    "status": "parse subtitle failed",
+    "data": []
+}
+parse subtitle failed: 视频硬字幕数据识别成功, 但是解析字幕数据时出错了
+
+
+
+
+视频硬字幕提取过程中产生的缓存数据清理(包含数据库和内存缓存两级缓存, from_scratch参数控制数据库层的字幕缓存)
+POST /clean_hard_subtitle_cache
+请求参数:
+file_hash: 文件hash值, 必填参数
+from_scratch: 是否从零开始提取字幕(即清理上一次同一个视频文件提取字幕请求的缓存数据,则下次会从零开始进行字幕提取, 否则同一个文件会首先从数据库查询上一次的提取结果), bool类型, 可选参数, 默认为false
+              若from_scratch=false, 则只清理字幕内存缓存, 若from_scratch=true, 则会同时清理数据库和内存缓存两级缓存.
+响应数据:
+{"code": 200, "message": "ok"}
+或
+{"code": 500, "message": "error"}
+
+
+
+视频软字幕提取
+POST /soft_subtitle_extract
+请求参数:
+file: 文件域, 必填参数, 
+ffmpeg_basepath: ffmpeg安装根目录,可选参数,
+subtitle_output_dir: 软字幕文件输出目录, 字符串类型, 可选参数
+encoding: 软字幕文件读取字符集编码, 字符串类型, 可选参数, 默认值utf8
+
+
+响应数据:
+{
+    "code": 200, 
+    "message": "ok", 
+    "data": response_data, 
+    "file_name": original_video_filename
+}

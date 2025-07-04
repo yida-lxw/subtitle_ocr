@@ -1,0 +1,8 @@
+thread:
+  pool:
+    # 线程最大并发数
+    concurrency-level: 5
+    # 最大线程数
+    max-pool-size: 4
+    # 线程名称前缀
+    thread-name-prefix: subtitle-extraction

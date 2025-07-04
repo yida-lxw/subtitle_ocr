@@ -1,0 +1,143 @@
+# Python 3.10
+# conda create -n subtitle-ocr3.10 python=3.10
+# conda activate subtitle-ocr3.10
+# pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# conda install -c conda-forge ccache
+
+# for CUDA11.8
+#python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+
+# for CUDA12.2
+#python -m pip install paddlepaddle-gpu==2.6.2.post120 -i https://www.paddlepaddle.org.cn/packages/stable/cu120/
+
+# for CUDA12.6
+#python -m pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu126/
+
+
+
+
+# python -m pip install paddleocr==3.1.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# web
+fastapi==0.115.12
+uvicorn==0.34.0
+gunicorn==23.0.0
+python-multipart==0.0.20
+
+matplotlib>=3.3.0
+pandas==2.0.3
+pillow>=7.1.2
+pyyaml>=5.3.1
+tqdm>=4.64.0
+termcolor==2.5.0
+cachetools==5.5.2
+
+
+aiohttp
+aiosignal
+annotated-types
+anyio
+astor
+attrs
+cachetools
+certifi
+chardet
+charset-normalizer
+colorama
+colorlog
+cssselect
+cssutils
+dataclasses-json
+decorator
+distro
+einops
+et_xmlfile
+filelock
+frozenlist
+fsspec
+ftfy
+GPUtil
+greenlet
+h11
+httpcore
+httpx
+httpx-sse
+huggingface-hub
+idna
+imagesize
+Jinja2
+jiter
+joblib
+jsonpatch
+jsonpointer
+langchain
+langchain-community
+langchain-core
+langchain-openai
+langchain-text-splitters
+langsmith
+Levenshtein
+lxml
+MarkupSafe
+marshmallow
+more-itertools
+multidict
+mypy_extensions
+networkx
+numpy
+openai
+opencv-contrib-python
+openpyxl
+opt-einsum
+orjson
+packaging
+
+scikit-learn
+scipy
+pandas
+pillow
+premailer
+prettytable
+propcache
+protobuf
+py-cpuinfo
+pyclipper
+pydantic
+pydantic-settings
+pydantic_core
+pypdfium2
+python-dateutil
+python-dotenv
+python-Levenshtein
+pytz
+PyYAML
+RapidFuzz
+regex
+requests
+requests-toolbelt
+ruamel.yaml
+ruamel.yaml.clib
+setuptools==75.3.2
+shapely
+six
+sniffio
+SQLAlchemy
+tenacity
+thefuzz
+threadpoolctl
+tiktoken
+tqdm
+
+tzdata
+ujson
+urllib3
+wcwidth
+yarl
+zstandard
+
+
+
+
+
+

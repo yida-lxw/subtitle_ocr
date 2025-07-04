@@ -1,0 +1,68 @@
+app:
+  # 视频字幕提取服务的主机IP
+  host: 192.168.0.106
+  # 视频字幕提取服务监听的端口
+  port: 8999
+  # 视频字幕提取服务默认启动的线程数
+  workers: 1
+  # 视频字幕区域检测模型文件路径
+  model_path: 'E:/python_projects/subtitle-ocr/models/best_20250410.pt'
+  # 字幕区域推理的置信度阈值,小于该值则判定为无效区域
+  predict_min_score: 0.60
+  # 是否输出带标注框的图片
+  output_predict_image: false
+  # 模型推理后是否删除原始图片
+  delete_original_image_after_predict: false
+  # ffmpeg.exe的磁盘绝对路径
+  ffmpeg_path: D:/ffmpeg-5.1.2/
+  # 程序工作目录
+  work_dir: D:/tmp/
+  # 上传文件保存目录(仅仅是目录名称,相对于work_dir)
+  upload_relative_dir: uploads
+  # 提取的视频帧图像文件存储目录名称
+  extracted_frames_relative_dir: extracted_frames
+  # 裁剪的字幕区域图像文件存储目录名称
+  croped_images_relative_dir: croped_images
+  # 提取出来的硬字幕文件存储目录名称
+  hard_subtitle_output_folder: hard_srts
+  # 是否启用输出硬字幕文件至磁盘
+  enable_output_hard_subtitle_file: False
+  # 提取出来的软字幕文件存储目录名称
+  extracted_soft_subtitles_dir: extracted_soft_subtitles
+  # 视频字幕数据存储于SQLLite中的表名
+  video_hard_subtitle_ocr_table_name: video_hard_subtitle_ocr_result
+  # 自动调整待OCR识别的图片的角度
+  ocr_auto_rotate_image: false
+  # OCR识别文本支持的语言:(ch/en)
+  ocr_language: ch
+  # PaddleOCR模型文件目录
+  paddle_model_base_dir: D:/models/PaddlePaddle/
+  # 使用的推理设备(cpu/gpu/npu)
+  use_device: gpu
+  # 是否全屏识别字幕, False=只识别图片底部的字幕, True=图片上任意位置出现的文本都识别为字幕
+  use_fullframe: False
+  # 字幕识别时跳过开头前几帧,1表示跳过开头的第1帧
+  frames_to_skip: 1
+  # 字幕行与行之间置信度阈值, 若超过设定阈值, 则判断两行字幕内容相同,同时合并为一行
+  sim_threshold: 80
+  # 字幕文本置信度阈值, 低于设定阈值的识别字幕文本将会被丢弃
+  conf_threshold: 75
+  # 像素点亮度阈值, 亮度高于设定阈值的像素点会被调整为黑色, 用于更好的识别白色字幕
+  brightness_threshold: 210
+  # 两张图片允许不相似的像素点最大个数, 超过设定阈值, 则判定两张图片为不同图片,否则则判定两张图片为同一张图片
+  similar_image_threshold: 1000
+  # 两个图片像素点相似度阈值
+  similar_pixel_threshold: 25
+  # 缓存项最大数量
+  kv_cache_max_size: 100000
+  # 缓存项最大生存时间(单位:秒)
+  kv_cache_max_age: 3600
+  # 是否启用字幕缓存
+  enable_subtitle_cache: true
+  # 需要排除的字幕文本
+  exclude_words:
+    - "备案号：V0110544191118"
+    - "备案号：V0110544191118011"
+    - "备案号0105419118011"
+    - "备案号：V1105441911501"
+    - "备案号：V11054419115011"
