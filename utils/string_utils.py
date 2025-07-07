@@ -5,7 +5,6 @@ import os
 import random
 import re
 import socket
-from opencc import OpenCC
 from complex_encoder import ComplexEncoder
 from utils.os_utils import OSUtils
 
@@ -231,34 +230,6 @@ class StringUtils:
         for key, value in protected_strings.items():
             final_content = final_content.replace(key, value)
         return final_content
-
-    """
-    判断给定文本中是否包含繁体字
-    """
-
-    @staticmethod
-    def has_traditional_by_unicode(text):
-        if text is None or len(text) <= 0:
-            return False
-        converter = OpenCC('t2s')
-        return text != converter.convert(text)
-
-
-    """
-    繁体转简体
-    """
-
-    @staticmethod
-    def to_simplified_chinese(text):
-        if text is None or len(text) <= 0:
-            return text
-        converter = OpenCC('t2s')
-        try:
-            convert_result = converter.convert(text)
-        except:
-            convert_result = text
-        finally:
-            return convert_result
 
 
     # 判断给定的文本是否为IP地址或域名
