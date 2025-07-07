@@ -1,7 +1,7 @@
 # Python 3.10
 # conda create -n subtitle-ocr3.10 python=3.10
 # conda activate subtitle-ocr3.10
-# pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --verbose
 
 # conda install -c conda-forge ccache
 
@@ -20,13 +20,15 @@
 # python -m pip install paddleocr==3.1.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # web
+aiofiles==24.1.0
 fastapi==0.115.12
 uvicorn==0.34.0
 gunicorn==23.0.0
 python-multipart==0.0.20
 
 matplotlib>=3.3.0
-pandas==2.0.3
+numpy==2.2.6
+pandas==2.3.0
 pillow>=7.1.2
 pyyaml>=5.3.1
 tqdm>=4.64.0
@@ -85,7 +87,6 @@ more-itertools
 multidict
 mypy_extensions
 networkx
-numpy
 openai
 opencv-contrib-python
 openpyxl
