@@ -65,7 +65,8 @@ nohup gunicorn --bind 192.168.0.100:8999 main:app --log-level=info --workers=8 >
 # 启动后运行日志写入日志文件(Windows)
 unicorn --bind 192.168.0.100:8999 main:app --log-level=info --workers=8 -c "accesslog='access.log',errorlog='error.log'"
 ~~~
-> 注意: gunicorn开头的命令用于Linux环境, uvicorn开头的命令用于Windows环境.
+> 注意: <br/> gunicorn开头的命令用于Linux环境, uvicorn开头的命令用于Windows环境.<br/>另外，启动时， 若控制台打印出类似如下警告信息:<br/>UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)<br/>则需要执行 conda install -c conda-forge ccache 命令安装ccache<br/>
 
 ### Windows后台运行Python程序
 
