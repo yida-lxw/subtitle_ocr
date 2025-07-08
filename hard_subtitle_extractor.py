@@ -24,13 +24,6 @@ class HardSubtitleExtractor:
     def extract_hard_subtitle(self, video_file_path: str, time_start: str="00:00", time_end: str=None, crop_x: int=None, crop_y: int=None,
                              crop_width: int=None, crop_height: int=None) -> str:
         if StringUtils.is_empty(time_end):
-            # video_info = VideoUtils.get_video_info(video_file_path, self.app_config.ffmpeg_path)
-            # video_duration = video_info['duration']
-            # video_duration_str = VideoUtils.get_video_duration_str(video_duration)
-            # if StringUtils.is_empty(time_start):
-            #     time_end = ""
-            # else:
-            #     time_end = video_duration_str
             video_duration = VideoUtils.get_video_duration(video_file_path)
             time_end = video_duration
 
@@ -53,7 +46,35 @@ class HardSubtitleExtractor:
         if StringUtils.is_empty(subtitle_content):
             return False, []
         parse_result, hard_subtitle_list = SubtitleUtils.parse_srt_subtitle(subtitle_content)
+        if parse_result:
+            hard_subtitle_list = self.subtitle_deduplicate(hard_subtitle_list)
         return parse_result, hard_subtitle_list
+
+    def subtitle_deduplicate(self, hard_subtitle_list):
+        if hard_subtitle_list is None or len(hard_subtitle_list) <= 0:
+            return None
+
+        # 初始化结果列表，第一个元素直接放入
+        dedup_list = [hard_subtitle_list[0].copy()]
+
+        for current in hard_subtitle_list[1:]:
+            last = dedup_list[-1]
+
+            # 检查当前字幕是否与上一个字幕内容相同
+            if current["subtitle"] == last["subtitle"]:
+                # 合并时间范围：start_time取前者，end_time取后者
+                last["end_time"] = current["end_time"]
+                last["time_range"] = f"{last['start_time']} --> {current['end_time']}"
+            else:
+                # 不同则添加到结果列表
+                dedup_list.append(current.copy())
+
+        # 重新编号ID保持连续递增
+        for idx, item in enumerate(dedup_list, start=1):
+            item["id"] = idx
+
+        return dedup_list
+
 
     def set_user_fullframe(self, user_fullframe: bool):
         if self.video is not None:

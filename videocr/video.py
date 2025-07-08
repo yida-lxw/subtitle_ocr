@@ -187,13 +187,17 @@ class Video:
             return None
         if text in self.exclude_words:
             return None
+
+        if StringUtils.is_letter_number_or_punctuation(text):
+            return None
+
         if "\n" in text:
             text_array = text.split("\n")
             text_first = text_array[0]
             text_second = text_array[1]
-            if text_first in self.exclude_words:
+            if text_first in self.exclude_words or StringUtils.is_letter_number_or_punctuation(text_first):
                 text_first = ""
-            if text_second in self.exclude_words:
+            if text_second in self.exclude_words or StringUtils.is_letter_number_or_punctuation(text_second):
                 text_second = ""
 
             if StringUtils.is_empty(text_first) and StringUtils.is_empty(text_second):
@@ -208,9 +212,9 @@ class Video:
             text_array = text.split(",")
             text_first = text_array[0]
             text_second = text_array[1]
-            if text_first in self.exclude_words:
+            if text_first in self.exclude_words or StringUtils.is_letter_number_or_punctuation(text_first):
                 text_first = ""
-            if text_second in self.exclude_words:
+            if text_second in self.exclude_words or StringUtils.is_letter_number_or_punctuation(text_second):
                 text_second = ""
 
             if StringUtils.is_empty(text_first) and StringUtils.is_empty(text_second):
@@ -225,9 +229,9 @@ class Video:
             text_array = text.split(" ")
             text_first = text_array[0]
             text_second = text_array[1]
-            if text_first in self.exclude_words:
+            if text_first in self.exclude_words or StringUtils.is_letter_number_or_punctuation(text_first):
                 text_first = ""
-            if text_second in self.exclude_words:
+            if text_second in self.exclude_words or StringUtils.is_letter_number_or_punctuation(text_second):
                 text_second = ""
 
             if StringUtils.is_empty(text_first) and StringUtils.is_empty(text_second):

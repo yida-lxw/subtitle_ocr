@@ -1,0 +1,14 @@
+debug = true
+trace = true
+insecure-entitlements = ["network.host", "security.insecure"]
+[registry."docker.io"]
+mirrors = ["docker.1panel.live", "dockerhub.icu"]
+http = true
+insecure = true
+[registry."demo.witarchive.com:4444"]
+#因为使用了4444这个作为镜像,所以必须要配置这里xxxx
+insecure = true
+http = true
+[registry."demo.witarchive.com:5555"]
+insecure = true
+http = true

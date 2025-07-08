@@ -17,3 +17,14 @@ class DateUtils:
         now = datetime.now()
         return now.strftime(formate)
 
+    @staticmethod
+    def larger_than(time1:str, time2:str):
+        time_arr1 = time1.split(":")
+        time_arr2 = time2.split(":")
+        if len(time_arr1) == 1 and len(time_arr2) == 1:
+            return int(time_arr1[0]) > int(time_arr2[0])
+        if len(time_arr1) == 1 and len(time_arr2) == 2:
+            minitue2 = time_arr2[1]
+            return int(time_arr1[0]) > int(time_arr2[0])
+
+

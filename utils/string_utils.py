@@ -14,6 +14,8 @@ from utils.os_utils import OSUtils
 @IDE      PyCharm
 @Desc     字符串操作工具类
 '''
+numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
 class StringUtils:
     """
     判断给定字符串是否为空
@@ -318,6 +320,39 @@ class StringUtils:
     def is_alphanumeric(text_str):
         return bool(re.fullmatch(r'^[a-zA-Z0-9]+$', text_str))
 
+    @staticmethod
+    def is_letter_number_or_punctuation(char: str) -> bool:
+        """
+        判断字符是否为英文字母或标点符号（含全角/半角）
+        修正：新增对全角中点(U+30FB)的支持
+        """
+        if len(char) > 1:
+            return False
+
+        # 英文字母检测
+        if 'a' <= char.lower() <= 'z':
+            return True
+
+        # 阿拉伯数字检测
+        if char in numbers:
+            return True
+
+        # Unicode码点检测
+        cp = ord(char)
+        return (
+            # 半角标点（ASCII标点）
+                (33 <= cp <= 47) or
+                (58 <= cp <= 64) or
+                (91 <= cp <= 96) or
+                (123 <= cp <= 126) or
+                # 全角标点（中文/日文）
+                (cp == 0x3000) or  # 全角空格
+                (cp == 0x30FB) or  # ・ 全角中点（新增）
+                (0xFF01 <= cp <= 0xFF0F) or  # ！＂＃＄％＆＇（）＊＋，－．／
+                (0xFF1A <= cp <= 0xFF20) or  # ：；＜＝＞？＠
+                (0xFF3B <= cp <= 0xFF40) or  # ［＼］＾＿｀
+                (0xFF5B <= cp <= 0xFF65)  # ｛｜｝～～
+        )
 
 
 if __name__ == '__main__':

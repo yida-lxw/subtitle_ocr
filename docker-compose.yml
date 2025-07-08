@@ -1,0 +1,30 @@
+version: "3.4"
+name: py-pro-ocr
+services:
+
+  subtitle-ocr:
+    # 本地构建镜像使用
+    # build:
+    #   context: .
+    # image: subtitle-ocr:1.0.0
+    # container_name: python_subtitle-ocr
+    # 使用私有镜像仓库镜像
+    image: demo.witarchive.com:5555/py-pro/subtitle-ocr:1.0.0
+    #platform: linux/amd64 #(多平台时使用)
+    runtime: nvidia # 需要使用GPU
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all  # 显示所有 GPU 设备
+      - TZ=Asia/Shanghai
+      - KMP_DUPLICATE_LIB_OK=TRUE
+    volumes:
+      - ./config/app.yml:/app/config/app.yml  # 配置文件(app配置文件直接改)
+      - ./config/db.yml:/app/config/db.yml  # 配置文件(数据库的配置文件)
+      - ./tmp:/tmp #工作及图片存放位置
+      - ./db/SQLite3_DB/:/SQLite3_DB
+      - ./models:/models
+      - ./.paddleocr/whl:/root/.paddleocr/whl
+    ports:
+      - "8999:8999"  # 主机端口:容器端口
+    working_dir: /app
+    # command: "tail -f /dev/null"
+    command: "python ./main.py"

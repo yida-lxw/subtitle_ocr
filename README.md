@@ -110,3 +110,20 @@ taskkill  /F /T /pid xxxxx
 # Linux
 kill -9 xxxxx
 ~~~
+
+# 使用docker-compose部署项目流程：
+```text
+构建：（注意pytorch与CUDA版本匹配问题-若部署服务器不适配请修改或重制Dockerfile重新构建镜像，测试机CUDA=12.2）
+特别注意：paddleocr包与paddlepaddle-gpu包的版本冲突，及与机器的CUDA匹配问题
+1.将项目代码复制到构建服务器
+2.执行构建命令
+构建项目镜像（执行）：docker-build-image.sh(单平台，构建服务器决定)（已构建版本linux/amd64，修改代码后需要执行,注意版本控制）
+构建项目镜像（执行）：docker-build-image-many.sh(多平台暂不支持，原因：paddleocr、paddlepaddle-gpu均不支持arm架构，实在需要请通过源码编译的方式在ARM架构上安装)
+（已构建版本无(未测试)，修改代码后需要执行,注意版本控制）
+
+部署：（创建文件夹或文件可以不必按照下面要求的级别，修改docker-compose.yml挂载的路径就行）
+1. 在服务器与docker-compose.yml同级别创建包config复制配置文件并修改config/app.yml 、config/db.yml
+2. 在服务器与docker-compose.yml同级别创建包.paddleocr用于存放项目其他依赖(一般启动会自动下载，没网的就自己下载好放进去)：.paddleocr/whl/cls/**、.paddleocr/whl/det/**、.paddleocr/whl/rec/**
+3. 在服务器与docker-compose.yml同级别创建包models用于存放项目使用的第三方模型：PaddlePaddle/**
+4. 到服务器路径下执行命令： docker compose up -d 或 docker-compose up -d
+```

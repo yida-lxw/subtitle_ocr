@@ -18,20 +18,24 @@ create_table_sql_tpl = f"""
         CREATE TABLE IF NOT EXISTS {table_name} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             task_id  TEXT NOT NULL,
-            file_hash  TEXT NOT NULL,
+            file_hash TEXT NOT NULL,
+            time_start TEXT NOT NULL,
+            time_end TEXT NOT NULL,
             subtitle_content  TEXT NOT NULL
         );
     """
 
-count_sql = f"select count(*) from {table_name} where file_hash = ?"
-select_sql = f"SELECT * FROM {table_name} WHERE file_hash = ? limit 1"
-insert_sql = f"INSERT OR IGNORE INTO {table_name}(task_id, file_hash, subtitle_content) VALUES (?,?,?)"
-update_sql = f"UPDATE {table_name} SET task_id=?, subtitle_content=? WHERE file_hash=?"
+count_sql = f"select count(*) from {table_name} where file_hash = ? and time_start=? and time_end=?"
+select_sql = f"SELECT * FROM {table_name} WHERE file_hash = ? and time_start=? and time_end=? limit 1"
+insert_sql = f"INSERT OR IGNORE INTO {table_name}(task_id, file_hash, time_start, time_end, subtitle_content) VALUES (?,?,?,?,?)"
+update_sql = f"UPDATE {table_name} SET task_id=?, subtitle_content=? WHERE file_hash=? and time_start=? and time_end=?"
 
 class HardSubtitleOcrResultInfo:
-    def __init__(self, task_id: str, file_hash:str, subtitle_content:str):
+    def __init__(self, task_id: str, file_hash:str, time_start:str, time_end:str, subtitle_content:str):
         self.task_id = task_id
         self.file_hash = file_hash
+        self.time_start = time_start
+        self.time_end = time_end
         self.subtitle_content = subtitle_content
 
     def to_dict(self):
@@ -52,8 +56,8 @@ class HardSubtitleOcrResultWriter:
         create_result_text = "成功" if create_result else "失败"
         print(f"SQLLite表{table_name}创建{create_result_text}")
 
-    def load_hard_subtitle(self, file_hash: str):
-        hard_subtitle_info = self.sql_template.find_one(select_sql, args=(file_hash,))
+    def load_hard_subtitle(self, file_hash: str, time_start:str , time_end: str):
+        hard_subtitle_info = self.sql_template.find_one(select_sql, args=(file_hash,time_start, time_end,))
         return hard_subtitle_info
 
     def save_ocr_result(self, hard_subtitle_ocr_result_info: HardSubtitleOcrResultInfo) -> bool:
@@ -64,19 +68,22 @@ class HardSubtitleOcrResultWriter:
         file_hash = hard_subtitle_ocr_result_info.file_hash
         subtitle_content = hard_subtitle_ocr_result_info.subtitle_content
 
-        save_result = self.sql_template.find_one(select_sql, (file_hash,))
+        time_start = hard_subtitle_ocr_result_info.time_start
+        time_end = hard_subtitle_ocr_result_info.time_end
+
+        search_result = self.sql_template.find_one(select_sql, (file_hash,time_start, time_end,))
         data_json = StringUtils.to_json_str(hard_subtitle_ocr_result_info.to_dict())
         print(f"insert-sql:{insert_sql},params:\n{data_json}")
-        if save_result is None or len(save_result) <= 0:
-            effect_row = self.sql_template.insert(insert_sql, return_id=False, args=(task_id, file_hash,subtitle_content))
+        if search_result is None or len(search_result) <= 0:
+            effect_row = self.sql_template.insert(insert_sql, return_id=False, args=(task_id, file_hash,time_start, time_end, subtitle_content))
         else:
-            effect_row = self.sql_template.update(update_sql, args=(task_id,subtitle_content, file_hash))
+            effect_row = self.sql_template.update(update_sql, args=(task_id,subtitle_content, file_hash,time_start, time_end))
         return effect_row > 0
 
 
     # 判断当前文件的硬字幕数据是否已经存在
-    def hard_subtitle_exists(self, file_hash: str):
-        image_subtitle_ocr_matched_count = self.sql_template.query_count(count_sql, args=(file_hash,))
+    def hard_subtitle_exists(self, file_hash: str, time_start: str, time_end: str):
+        image_subtitle_ocr_matched_count = self.sql_template.query_count(count_sql, args=(file_hash,time_start, time_end,))
         return image_subtitle_ocr_matched_count > 0
 
 

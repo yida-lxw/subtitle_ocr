@@ -120,8 +120,8 @@ async def write_file_chunk(file: UploadFile, upload_file_parent_path: str, file_
         await f.flush()
 
 
-def prepare_hard_subtitle_info_from_db(file_hash: str):
-    subtitle_info = hard_subtitle_ocr_result_writer.load_hard_subtitle(file_hash)
+def prepare_hard_subtitle_info_from_db(file_hash: str, time_start:str, time_end: str):
+    subtitle_info = hard_subtitle_ocr_result_writer.load_hard_subtitle(file_hash, time_start, time_end)
     if subtitle_info is None:
         return None
     else:
@@ -134,6 +134,8 @@ def prepare_hard_subtitle_info_from_db(file_hash: str):
             "message": "ok",
             "task_id": task_id,
             "file_hash": file_hash,
+            "time_start": time_start,
+            "time_end": time_end,
             "data": srt_content_list
         }
 
@@ -276,14 +278,8 @@ async def hard_subtitle_check_in(
         time_start: str = Form(default= "00:00"),
         time_end: str = Form(default= None),
         user_fullframe: bool= Form(default= False)):
-    if enable_subtitle_cache:
-        response_json = kv_cache.get(file_hash)
-        if response_json is not None and len(response_json) > 0:
-            return response_json
-    if enable_subtitle_cache:
-        subtitle_info = prepare_hard_subtitle_info_from_db(file_hash)
-        if subtitle_info is not None:
-            return subtitle_info
+
+
     upload_file_parent_path = work_dir + upload_dir + "/" + file_name + "/" + file_type + "/chunks/" + file_hash + "/"
     target_filename = file_name + "." + file_type
     video_file_path = upload_file_parent_path + target_filename
@@ -294,6 +290,20 @@ async def hard_subtitle_check_in(
             "status": "target video file not found",
             "data": []
         }
+
+    if StringUtils.is_empty(time_end):
+        video_duration = VideoUtils.get_video_duration(video_file_path)
+        time_end = video_duration
+    cache_key = file_hash + "#" + time_start + "#" + time_end
+    if enable_subtitle_cache:
+        response_json = kv_cache.get(cache_key)
+        if response_json is not None and len(response_json) > 0:
+            return response_json
+    if enable_subtitle_cache:
+        subtitle_info = prepare_hard_subtitle_info_from_db(file_hash, time_start, time_end)
+        if subtitle_info is not None:
+            return subtitle_info
+
     hard_subtitle_extractor.set_user_fullframe(user_fullframe)
     subtitle_content = hard_subtitle_extractor.extract_hard_subtitle(video_file_path, time_start, time_end)
     if StringUtils.is_empty(subtitle_content):
@@ -319,12 +329,14 @@ async def hard_subtitle_check_in(
         "status": "success",
         "task_id": task_id,
         "file_hash": file_hash,
+        "time_start": time_start,
+        "time_end": time_end,
         "data": hard_subtitle_list
     }
     if hard_subtitle_list is not None and len(hard_subtitle_list) > 0:
-        kv_cache.set(file_hash, response_data)
+        kv_cache.set(cache_key, response_data)
         subtitle_content_json = StringUtils.to_json_str(hard_subtitle_list)
-        hard_subtitle_ocr_result_info = HardSubtitleOcrResultInfo(task_id, file_hash, subtitle_content_json)
+        hard_subtitle_ocr_result_info = HardSubtitleOcrResultInfo(task_id, file_hash, time_start, time_end, subtitle_content_json)
         hard_subtitle_ocr_result_writer.save_ocr_result(hard_subtitle_ocr_result_info)
     return response_data
 
