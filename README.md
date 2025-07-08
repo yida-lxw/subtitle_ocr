@@ -113,7 +113,7 @@ kill -9 xxxxx
 
 # 使用docker-compose部署项目流程：
 ```text
-构建：（注意pytorch与CUDA版本匹配问题-若部署服务器不适配请修改或重制Dockerfile重新构建镜像，测试机CUDA=12.2）
+构建：（注意pytorch与CUDA版本匹配问题-若部署服务器不适配请修改或重制Dockerfile重新构建镜像）
 特别注意：paddleocr包与paddlepaddle-gpu包的版本冲突，及与机器的CUDA匹配问题
 1.将项目代码复制到构建服务器
 2.执行构建命令
