@@ -1,5 +1,5 @@
 echo "Deploying application..."
-DOCKER_REGISTRY=demo.witarchive.com:5555
+DOCKER_REGISTRY=xxxxx.com:5555
 IMAGE_NAME=subtitle-ocr
 # 版本控制
 IMAGE_TAG=1.0.0

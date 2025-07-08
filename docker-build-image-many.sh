@@ -1,6 +1,6 @@
 echo "Deploying application..."
 # 定义一些参数
-DOCKER_REGISTRY=demo.witarchive.com:5555
+DOCKER_REGISTRY=xxxxxx:5555
 BUILD_NAME=ocrbuilder-tmp
 IMAGE_NAME=subtitle-ocr
 # 版本控制（这个版本号拿来做多平台不与之前的冲突）
